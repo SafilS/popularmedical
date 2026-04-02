@@ -1,7 +1,57 @@
+import React, { useState } from 'react';
 import { MapPin, Phone, Mail, Clock } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { toast } from 'react-hot-toast';
 
 const Contact = () => {
+  const [formData, setFormData] = useState({
+    name: '',
+    phone: '',
+    message: ''
+  });
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: value
+    }));
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    
+    // Basic validation
+    if (!formData.name.trim() || !formData.phone.trim() || !formData.message.trim()) {
+      toast.error('Please fill in all fields');
+      return;
+    }
+
+    // Phone number validation (10 digits starting with 6-9)
+    const phoneRegex = /^[6-9]\d{9}$/;
+    if (!phoneRegex.test(formData.phone)) {
+      toast.error('Please enter a valid 10-digit mobile number');
+      return;
+    }
+
+    // Simulate submission
+    const loadingToast = toast.loading('Sending your message...');
+    
+    setTimeout(() => {
+      toast.success('Message sent successfully! We will get back to you soon.', {
+        id: loadingToast,
+      });
+      console.log('Form submitted:', formData);
+      
+      // Reset form
+      setFormData({
+        name: '',
+        phone: '',
+        message: ''
+      });
+    }, 1500);
+  };
+
   return (
     <motion.div 
       initial={{ opacity: 0, y: 20 }}
@@ -76,13 +126,17 @@ const Contact = () => {
           {/* Contact Form */}
           <div className="bg-white p-8 md:p-10 rounded-3xl shadow-lg border border-gray-100">
             <h2 className="text-2xl font-bold text-gray-900 mb-6">Send us a Message</h2>
-            <form className="space-y-6">
+            <form onSubmit={handleSubmit} className="space-y-6">
               <div>
                 <label className="block text-sm font-semibold text-gray-700 mb-2">Full Name</label>
                 <input 
                   type="text" 
+                  name="name"
+                  value={formData.name}
+                  onChange={handleChange}
                   className="w-full px-5 py-3 rounded-xl border border-gray-200 focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all outline-none bg-gray-50 focus:bg-white"
                   placeholder="John Doe"
+                  required
                 />
               </div>
               
@@ -90,22 +144,30 @@ const Contact = () => {
                 <label className="block text-sm font-semibold text-gray-700 mb-2">Phone Number</label>
                 <input 
                   type="tel" 
+                  name="phone"
+                  value={formData.phone}
+                  onChange={handleChange}
                   className="w-full px-5 py-3 rounded-xl border border-gray-200 focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all outline-none bg-gray-50 focus:bg-white"
-                  placeholder="+91 98765 43210"
+                  placeholder="9876543210"
+                  required
                 />
               </div>
               
               <div>
                 <label className="block text-sm font-semibold text-gray-700 mb-2">Your Message</label>
                 <textarea 
+                  name="message"
+                  value={formData.message}
+                  onChange={handleChange}
                   rows={4}
                   className="w-full px-5 py-3 rounded-xl border border-gray-200 focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all outline-none bg-gray-50 focus:bg-white resize-none"
                   placeholder="How can we help you?"
+                  required
                 ></textarea>
               </div>
 
               <button 
-                type="button"
+                type="submit"
                 className="w-full bg-primary text-white py-4 rounded-xl font-bold text-lg hover:bg-blue-600 transition-colors shadow-md transform hover:-translate-y-0.5"
               >
                 Send Message

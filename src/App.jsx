@@ -3,6 +3,7 @@ import Navbar from './components/layout/Navbar';
 import Footer from './components/layout/Footer';
 import FloatingContact from './components/layout/FloatingContact';
 import ScrollToTop from './components/layout/ScrollToTop';
+import { Toaster } from 'react-hot-toast';
 
 import Home from './pages/Home';
 import About from './pages/About';
@@ -30,6 +31,7 @@ function App() {
 
         <Footer />
         <FloatingContact />
+        <Toaster position="top-center" reverseOrder={false} />
       </div>
     </Router>
   );

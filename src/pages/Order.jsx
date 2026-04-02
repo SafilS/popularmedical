@@ -1,7 +1,59 @@
+import React, { useState } from 'react';
 import { Upload, Truck, Phone, PackageCheck } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { toast } from 'react-hot-toast';
 
 const Order = () => {
+  const [formData, setFormData] = useState({
+    name: '',
+    phone: '',
+    address: '',
+    remarks: ''
+  });
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: value
+    }));
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    
+    // Basic validation
+    if (!formData.name.trim() || !formData.phone.trim() || !formData.address.trim()) {
+      toast.error('Please fill in all required fields');
+      return;
+    }
+
+    // Phone number validation (10 digits starting with 6-9)
+    const phoneRegex = /^[6-9]\d{9}$/;
+    if (!phoneRegex.test(formData.phone)) {
+      toast.error('Please enter a valid 10-digit mobile number');
+      return;
+    }
+
+    // Simulate submission
+    const loadingToast = toast.loading('Placing your order request...');
+    
+    setTimeout(() => {
+      toast.success('Order request sent! Our pharmacist will call you shortly.', {
+        id: loadingToast,
+      });
+      console.log('Order submitted:', formData);
+      
+      // Reset form
+      setFormData({
+        name: '',
+        phone: '',
+        address: '',
+        remarks: ''
+      });
+    }, 2000);
+  };
+
   return (
     <motion.div 
       initial={{ opacity: 0, y: 20 }}
@@ -23,12 +75,15 @@ const Order = () => {
           <div className="lg:col-span-3 bg-white p-6 sm:p-10 rounded-3xl shadow-lg border border-gray-100 relative overflow-hidden">
             <h2 className="text-2xl font-bold text-gray-900 mb-8 border-b pb-4">Delivery Details</h2>
             
-            <form className="space-y-6">
+            <form onSubmit={handleSubmit} className="space-y-6">
               <div className="grid sm:grid-cols-2 gap-6">
                 <div>
                   <label className="block text-sm font-semibold text-gray-700 mb-2">Full Name <span className="text-red-500">*</span></label>
                   <input 
                     type="text" 
+                    name="name"
+                    value={formData.name}
+                    onChange={handleChange}
                     className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all outline-none bg-gray-50 focus:bg-white"
                     placeholder="Enter your name"
                     required
@@ -38,6 +93,9 @@ const Order = () => {
                   <label className="block text-sm font-semibold text-gray-700 mb-2">Phone Number <span className="text-red-500">*</span></label>
                   <input 
                     type="tel" 
+                    name="phone"
+                    value={formData.phone}
+                    onChange={handleChange}
                     className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all outline-none bg-gray-50 focus:bg-white"
                     placeholder="10-digit mobile number"
                     required
@@ -48,6 +106,9 @@ const Order = () => {
               <div>
                 <label className="block text-sm font-semibold text-gray-700 mb-2">Delivery Address <span className="text-red-500">*</span></label>
                 <textarea 
+                  name="address"
+                  value={formData.address}
+                  onChange={handleChange}
                   rows={3}
                   className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all outline-none bg-gray-50 focus:bg-white resize-none"
                   placeholder="Enter full address with landmark and pincode"
@@ -58,6 +119,9 @@ const Order = () => {
               <div>
                 <label className="block text-sm font-semibold text-gray-700 mb-2">Medicines / Remarks (Optional)</label>
                 <textarea 
+                  name="remarks"
+                  value={formData.remarks}
+                  onChange={handleChange}
                   rows={2}
                   className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all outline-none bg-gray-50 focus:bg-white resize-none"
                   placeholder="Type medicine names or alternative instructions..."
@@ -76,7 +140,7 @@ const Order = () => {
               </div>
 
               <button 
-                type="button"
+                type="submit"
                 className="w-full bg-accent text-white py-4 rounded-xl font-bold text-lg hover:bg-amber-600 transition-colors shadow-md mt-4 flex items-center justify-center gap-2 transform hover:-translate-y-0.5"
               >
                 <Truck size={22} />
